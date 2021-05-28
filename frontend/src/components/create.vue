@@ -44,6 +44,14 @@
             </v-btn>
           </v-date-picker>
         </v-menu>
+        <FilePond
+          name="test"
+          ref="pond"
+          label-idle="Drop files here..."
+          v-bind:allow-multiple="true"
+          accepted-file-types="image/jpeg, image/png"
+          server="/api"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -57,7 +65,20 @@
 </template>
 
 <script>
+// Do this in the components those need this plugin
+import vueFilePond from 'vue-filepond';
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import 'filepond/dist/filepond.min.css';
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
+
+const FilePond = vueFilePond(
+  FilePondPluginImagePreview
+);
+
 export default {
+  components: {
+    FilePond
+  }, 
   data() {
     return {
       menu: false, 
