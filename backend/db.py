@@ -6,6 +6,7 @@ def connect_db(host, database):
     return db[database]
 
 
+
 def insert_doc(db, col, name, age, date):
     doc = {
         "name": name, 

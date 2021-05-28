@@ -14,6 +14,7 @@ DB = None
 @app.route("/create-doc", methods=["POST"])
 def create_doc():
     body = request.get_json()
+
     name = body.get("name", "unknown")
     age = body.get("age", "-")
     date = body.get("date")
@@ -22,7 +23,7 @@ def create_doc():
     sleep(0.75)
 
     if date is None:
-        return "Date is required."
+        return "Date is required.", 422
     
     res = db.insert_doc(DB, config.testCol, name, age, date)
     return "ok", 200
@@ -45,7 +46,7 @@ def update_doc():
 def get_doc():
     args = request.args
     name = args.get("name")
-    age = int(args.get("age"))
+    age = args.get("age")
     date = args.get("date")
     
     res = db.get_doc(DB, config.testCol, name, age, date)

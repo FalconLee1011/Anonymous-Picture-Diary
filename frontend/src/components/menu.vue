@@ -5,7 +5,7 @@
         <v-spacer />
       <v-toolbar-items>
         <v-btn v-for="menuItem in menuItems" :key="menuItem.icon" :to="menuItem.link" :disabled="!menuItem.link">
-          <v-icon class="ml-2">{{menuItem.icon}}</v-icon>
+          <v-icon class="mr-2">{{menuItem.icon}}</v-icon>
           {{menuItem.text}}
         </v-btn>
       </v-toolbar-items>
@@ -18,10 +18,10 @@ export default {
   data() {
     return {
       menuItems:[
-         {
+        {
           text: "Home | 首頁", 
           icon: "mdi-home-outline", 
-          link: "home"
+          link: "/"
         },
         {
           text: "Create | 新增", 
@@ -36,7 +36,7 @@ export default {
         {
           text: "Read | 讀取", 
           icon: "mdi-book-open", 
-          link: undefined
+          link: "get"
         },
         {
           text: "Delete | 刪除", 

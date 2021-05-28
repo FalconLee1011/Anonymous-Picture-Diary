@@ -10,10 +10,10 @@
 
         <v-row>
           <v-col>
-            <v-text-field v-model="name" label="Name" id="id"></v-text-field>    
+            <v-text-field v-model="name" label="Name"></v-text-field>    
           </v-col>
           <v-col>
-            <v-text-field v-model="age" label="Age" id="id"></v-text-field>
+            <v-text-field v-model="age" label="Age"></v-text-field>
           </v-col>
         </v-row>
 
@@ -56,7 +56,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn @click="submitData" color="success" outlined>
-          <v-icon class="ml-2">mdi-send</v-icon>
+          <v-icon class="mr-2">mdi-send</v-icon>
           送出
         </v-btn>
       </v-card-actions>
