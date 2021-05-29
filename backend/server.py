@@ -1,6 +1,6 @@
 from time import sleep
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 
 import db, config
@@ -9,7 +9,28 @@ app = Flask(__name__)
 app.debug = True
 CORS(app)
 
-DB = None
+@app.route("/create-doc-with-attachment", methods=["POST"])
+def create_doc_with_attachment():
+    form = request.form
+    name = form.get("name", "unknown")
+    age = form.get("age", "-")
+    date = form.get("date")
+    file = request.files.get("file")
+
+    # Just for the effect.
+    sleep(0.75)
+    
+    res = db.insert_doc(name, age, date, file)
+    return "ok", 200
+
+@app.route("/get-attachment", methods=["GET"])
+def get_attachment():
+    args = request.args
+    uuid = args.get("uuid")
+    if(uuid is None):
+        return "File not specified", 422
+    file, mime = db.get_file(uuid)
+    return send_file(file, mimetype=mime), 200
 
 @app.route("/create-doc", methods=["POST"])
 def create_doc():
@@ -25,7 +46,7 @@ def create_doc():
     if date is None:
         return "Date is required.", 422
     
-    res = db.insert_doc(DB, config.testCol, name, age, date)
+    res = db.insert_doc(name, age, date)
     return "ok", 200
 
 @app.route("/update-doc", methods=["PUT"])
@@ -39,7 +60,7 @@ def update_doc():
     new_age = body.get("new_age")
     new_date = body.get("new_date")
 
-    res = db.update_doc(DB, config.testCol, name, age, date, new_name, new_age, new_date)
+    res = db.update_doc(name, age, date, new_name, new_age, new_date)
     return "Updated!", 200
 
 @app.route("/get-doc", methods=["GET"])
@@ -49,7 +70,7 @@ def get_doc():
     age = args.get("age")
     date = args.get("date")
     
-    res = db.get_doc(DB, config.testCol, name, age, date)
+    res = db.get_doc(name, age, date)
     return jsonify(res), 200
 
 @app.route("/delete-doc", methods=["DELETE"])
@@ -59,12 +80,21 @@ def delete_doc():
     age = body.get("age")
     date = body.get("date")
     
-    res = db.delete_doc(DB, config.testCol, name, age, date)
+    res = db.delete_doc(name, age, date)
     return "Deleted", 200
 
+def printAvailableAPIs():
+    basic_methods = ["GET", "POST", "PUT", "DELETE"]
+    print("")
+    print("  {:^40} | {:^15}".format("URL", "METHODS"))
+    # Flask app's property "url_map" has a function iter_rules() to loop through all available APIs.
+    for p in app.url_map.iter_rules():
+        print("  {:<40} | {:<15}".format(str(p), ", ".join(set(p.methods).intersection(basic_methods))))
+    print("")
+
 def main():
-    global DB
-    DB = db.connect_db(config.host, config.db)
+    db.connect_db(config.host, config.db)
+    printAvailableAPIs()
     app.run(host="0.0.0.0", port=9000, debug=True)
 
 

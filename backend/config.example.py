@@ -6,3 +6,4 @@ db = "testDB"
 
 # Define collections (can be multiple)
 testCol = "testCol"
+fileCol = "files"

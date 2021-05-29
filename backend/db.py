@@ -1,21 +1,38 @@
 from pymongo import MongoClient
 
+import config, filehandler
+
+DB = None
 
 def connect_db(host, database):
-    db = MongoClient(host)
-    return db[database]
+    global DB
+    DB = MongoClient(host)[database]
+    return DB
 
-
-
-def insert_doc(db, col, name, age, date):
+def insert_doc(name, age, date, file=None):
+    file_attr = dict()
+    if(file is not None):
+        file_attr = filehandler.saveFile(file)
     doc = {
         "name": name, 
         "age": age, 
-        "date": date
+        "date": date, 
+        "file": file_attr.get("uuid")
     }
-    return db.get_collection(col).insert_one(doc)
 
-def update_doc(db, col, name, age, date, new_name, new_age, new_date):
+    DB.get_collection(config.fileCol).insert_one(file_attr)
+
+    return DB.get_collection(config.testCol).insert_one(doc)
+
+def get_file(uuid):
+    file_attr = DB.get_collection(config.fileCol).find_one({"uuid": uuid}, {"_id": 0})
+    file = filehandler.getFile(file_attr.get("uuid"))
+    mime = file_attr.get("mime")
+    print(file)
+    print(mime)
+    return file, mime
+
+def update_doc(name, age, date, new_name, new_age, new_date):
     query = {
         "name": name, 
         "age": age, 
@@ -26,9 +43,9 @@ def update_doc(db, col, name, age, date, new_name, new_age, new_date):
         "age": new_age, 
         "date": new_date
     }
-    return db.get_collection(col).update_one(query, {"$set": new_doc})
+    return DB.get_collection(config.testCol).update_one(query, {"$set": new_doc})
 
-def get_doc(db, col, name, age, date):
+def get_doc(name, age, date):
     query = dict()
 
     if name: 
@@ -40,12 +57,12 @@ def get_doc(db, col, name, age, date):
     if date: 
         query["date"] = date
 
-    return list(db.get_collection(col).find(query, {"_id": 0}))
+    return list(DB.get_collection(config.testCol).find(query, {"_id": 0}))
 
-def delete_doc(db, col, name, age, date):
+def delete_doc(name, age, date):
     query = {
         "name": name, 
         "age": age, 
         "date": date
     }
-    return db.get_collection(col).delete_one(query)
+    return DB.get_collection(config.testCol).delete_one(query)
