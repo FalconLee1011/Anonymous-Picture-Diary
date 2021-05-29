@@ -9,6 +9,16 @@
           {{menuItem.text}}
         </v-btn>
       </v-toolbar-items>
+      <!-- <v-toolbar-items> -->
+        <v-expand-transition>
+          <v-btn v-if="darkTheme" class="ml-3 mr-1" icon @click="changeTheme">
+            <v-icon>mdi-moon-waxing-crescent</v-icon>
+          </v-btn>
+          <v-btn v-else class="ml-3 mr-1" icon @click="changeTheme">
+            <v-icon>mdi-white-balance-sunny</v-icon>
+          </v-btn>
+        </v-expand-transition>
+      <!-- </v-toolbar-items> -->
     </v-toolbar>
   </v-card>
 </template>
@@ -17,6 +27,7 @@
 export default {
   data() {
     return {
+      darkTheme: false, 
       menuItems:[
         {
           text: "Home | 首頁", 
@@ -45,6 +56,24 @@ export default {
         },
       ]
     }
+  },
+  created() {
+    let theme = localStorage.getItem("theme");    
+    if(theme === undefined || theme === null){
+      localStorage.setItem("theme", this.$vuetify.theme.dark);
+      theme = this.$vuetify.theme.dark;
+    }
+    this.$vuetify.theme.dark = (theme == "true" || theme === true) ? true : false;
+    this.darkTheme = this.$vuetify.theme.dark;
+  },
+  methods: {
+    changeTheme(){
+      this.darkTheme = !this.darkTheme;
+      this.$vuetify.theme.dark = this.darkTheme;
+      localStorage.setItem("theme", this.$vuetify.theme.dark);
+    }
+  },
+  watch: {
   },
 }
 </script>
