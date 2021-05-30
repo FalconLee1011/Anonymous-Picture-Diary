@@ -14,5 +14,8 @@ export default {
   components:{
     menubar
   }, 
+  created() {
+    console.log("App has been created.");
+  },
 };
 </script>

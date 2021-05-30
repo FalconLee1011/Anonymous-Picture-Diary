@@ -10,7 +10,7 @@ def saveFile(file):
     file_attr = dict()
     file_attr["filename"] = file.filename
     file_attr["uuid"] = str(uuid4())
-    
+
     file_path = path.join(FILE_DIR, file_attr['uuid'])
     file.save(file_path)
     

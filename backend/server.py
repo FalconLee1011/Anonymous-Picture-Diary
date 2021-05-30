@@ -15,6 +15,7 @@ def create_doc_with_attachment():
     name = form.get("name", "unknown")
     age = form.get("age", "-")
     date = form.get("date")
+
     file = request.files.get("file")
 
     # Just for the effect.
@@ -29,7 +30,7 @@ def get_attachment():
     uuid = args.get("uuid")
     if(uuid is None):
         return "File not specified", 422
-    file, mime = db.get_file(uuid)
+    file, mime = db.get_file(uuid) 
     return send_file(file, mimetype=mime), 200
 
 @app.route("/create-doc", methods=["POST"])

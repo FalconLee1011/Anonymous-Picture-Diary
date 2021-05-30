@@ -47,7 +47,7 @@
             </v-menu>
           </v-card-text>
         </v-tab-item>
-                <v-tab-item>
+        <v-tab-item>
           <v-card-text>
             <v-row>
               <v-col>
@@ -90,7 +90,7 @@
               :allow-multiple="false"
               :instantUpload="false"
               v-on:updatefiles="handleFileUpload"
-              :rules="[v => !!v || '請選擇至少一個檔案']"
+              :rules="[(v) => !!v || '請選擇至少一個檔案']"
             />
           </v-card-text>
         </v-tab-item>
@@ -130,13 +130,12 @@ export default {
       name: "",
       age: undefined,
       date: "",
-      files: [], 
+      files: [],
 
       // Loading & progress
       isLoading: false,
-      progressTotal: 0, 
-      progressCurrent: 1, 
-      
+      progressTotal: 0,
+      progressCurrent: 1,
     };
   },
   computed: {
@@ -147,7 +146,7 @@ export default {
     },
   },
   methods: {
-    handleFileUpload: function (files) {
+    handleFileUpload (files) {
       console.log(files);
       this.files = files.map((files) => files.file);
       console.log(this.files);
@@ -166,31 +165,33 @@ export default {
       }
       this.isLoading = false;
     },
-    async submitDataUsingJSON(){
+    async submitDataUsingJSON() {
       await this.$axios.post("http://127.0.0.1:9000/create-doc", {
         name: this.name,
         age: this.age,
         date: this.date,
       });
     },
-    async submitDataUsingFormData(){
+    async submitDataUsingFormData() {
       let payload = new FormData();
       payload.append("name", this.name);
       payload.append("age", this.age);
       payload.append("date", this.date);
-      
       for (let idx = 0; idx < this.files.length; idx++)
         payload.append(`file`, this.files[idx]);
 
       console.log(payload);
-      await this.$axios.post("http://127.0.0.1:9000/create-doc-with-attachment", payload, {
-        onUploadProgress: (e) => {
-          this.progressTotal = e.loaded;
-          this.progressCurrent = e.total;
-          console.log(this.progress);
-        },
-      });
-    }
+      await this.$axios.post(
+        "http://127.0.0.1:9000/create-doc-with-attachment",
+        payload,
+        {
+          onUploadProgress: (e) => {
+            this.progressTotal = e.loaded;
+            this.progressCurrent = e.total;
+          },
+        }
+      );
+    },
   },
 };
 </script>

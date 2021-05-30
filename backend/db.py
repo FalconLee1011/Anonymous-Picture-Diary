@@ -10,17 +10,18 @@ def connect_db(host, database):
     return DB
 
 def insert_doc(name, age, date, file=None):
-    file_attr = dict()
-    if(file is not None):
-        file_attr = filehandler.saveFile(file)
+
     doc = {
         "name": name, 
         "age": age, 
         "date": date, 
-        "file": file_attr.get("uuid")
+        "file": None
     }
 
-    DB.get_collection(config.fileCol).insert_one(file_attr)
+    if(file is not None):
+        file_attr = filehandler.saveFile(file)
+        DB.get_collection(config.fileCol).insert_one(file_attr)
+        doc["file"] = file_attr.get("uuid")
 
     return DB.get_collection(config.testCol).insert_one(doc)
 
