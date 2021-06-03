@@ -18,20 +18,8 @@
 </template>
 
 <script>
-// Do this in the components those need this plugin
-import vueFilePond from 'vue-filepond';
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-import 'filepond/dist/filepond.min.css';
-import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css';
-
-const FilePond = vueFilePond(
-  FilePondPluginImagePreview
-);
-
 export default {
-  components: {
-    FilePond
-  }, 
+
   data() {
     return {
       menu: false, 
