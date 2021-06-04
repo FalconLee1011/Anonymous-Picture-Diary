@@ -14,7 +14,7 @@ const routes = [
     component: home
   },
   {
-    path: '/create',
+    path: '/upload',
     name: 'create',
     component: create
   },

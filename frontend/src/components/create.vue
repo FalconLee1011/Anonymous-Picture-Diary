@@ -2,99 +2,68 @@
   <v-container min-width="80%">
     <v-card class="mt-5">
       <v-progress-linear v-model="progress" v-show="isLoading" />
-      <v-card-title primary-title> Create | 新增 </v-card-title>
-      <v-tabs v-model="tab">
-        <v-tab>JSON</v-tab>
-        <v-tab>FormData</v-tab>
-      </v-tabs>
-      <v-tabs-items v-model="tab">
-        <v-tab-item>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-text-field v-model="name" label="Name"></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field v-model="age" label="Age"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              :return-value.sync="date"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="date"
-                  label="Date"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="date" no-title scrollable>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false"> 取消 </v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(date)">
-                  確認
-                </v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-card-text>
-        </v-tab-item>
-        <v-tab-item>
-          <v-card-text>
-            <v-row>
-              <v-col>
-                <v-text-field v-model="name" label="Name"></v-text-field>
-              </v-col>
-              <v-col>
-                <v-text-field v-model="age" label="Age"></v-text-field>
-              </v-col>
-            </v-row>
-            <v-menu
-              ref="menu"
-              v-model="menu1"
-              :close-on-content-click="false"
-              :return-value.sync="date"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="date"
-                  label="Date"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="date" no-title scrollable>
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false"> 取消 </v-btn>
-                <v-btn text color="primary" @click="$refs.menu.save(date)">
-                  確認
-                </v-btn>
-              </v-date-picker>
-            </v-menu>
+      <v-card-title primary-title> Upload | 上傳照片 </v-card-title>
+      <v-card-text>
+        資訊
+        <v-divider />
+        <v-row>
+          <v-col>
+            <v-text-field
+              v-model="uplodaer"
+              :name="Math.random()"
+              label="Uplodaer | 上傳者"
+              hint="Keep blank to stay anonymously. | 留白以抱持匿名身份。"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
+              v-model="secret"
+              label="Secret | 密碼"
+              :append-icon="showSecreat ? 'mdi-eye-off' : 'mdi-eye'"
+              :type="showSecreat ? 'text' : 'password'"
+              @click:append="showSecreat = !showSecreat"
+              :name="Math.random()"
+              hint="The secret is the key to delete this post. | 此密碼是刪除貼文必備的資訊。"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-textarea
+              v-model="description"
+              :name="Math.random()"
+              rows="1"
+              auto-grow
+              hint="Multi-line is supported. | 支援多行"
+              label="Description | 相片說明"
+            ></v-textarea>
+          </v-col>
+        </v-row>
+        <v-row class="mb-3">
+          <v-col>
+            <v-text-field
+              v-model="tags"
+              label="Tags | 標籤"
+              :name="Math.random()"
+              hint="Split'em with comma | 使用逗號 ',' 將多個標籤分開。"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        照片
+        <v-divider class="mb-5" />
+        <v-row>
+          <v-col>
             <file-pond
               ref="uploader"
-              label-idle="拖曳或點擊上傳..."
+              label-idle="Drag & drop to upload | 拖曳並放開以上傳"
               :allow-multiple="false"
               :instantUpload="false"
               v-on:updatefiles="handleFileUpload"
               :rules="[(v) => !!v || '請選擇至少一個檔案']"
             />
-          </v-card-text>
-        </v-tab-item>
-      </v-tabs-items>
+          </v-col>
+        </v-row>
+      </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn @click="submitData" color="success" outlined>
@@ -123,13 +92,13 @@ export default {
     return {
       // Controls Vue's components
       tab: 1,
-      menu: false,
-      menu1: false,
+      showSecreat: false,
 
       // Form's data
-      name: "",
-      age: undefined,
-      date: "",
+      uplodaer: "",
+      secret: "",
+      description: "",
+      tags: "",
       files: [],
 
       // Loading & progress
@@ -146,51 +115,37 @@ export default {
     },
   },
   methods: {
-    handleFileUpload (files) {
-      console.log(files);
+    handleFileUpload(files) {
       this.files = files.map((files) => files.file);
-      console.log(this.files);
     },
     async submitData() {
       this.isLoading = true;
-      switch (this.tab) {
-        case 0:
-          await this.submitDataUsingJSON();
-          break;
-        case 1:
-          await this.submitDataUsingFormData();
-          break;
-        default:
-          break;
-      }
-      this.isLoading = false;
-    },
-    async submitDataUsingJSON() {
-      await this.$axios.post("http://127.0.0.1:9000/create-doc", {
-        name: this.name,
-        age: this.age,
-        date: this.date,
-      });
-    },
-    async submitDataUsingFormData() {
       let payload = new FormData();
-      payload.append("name", this.name);
-      payload.append("age", this.age);
-      payload.append("date", this.date);
+      let tags = [];
+      
+      this.tags.split(",").forEach( tag => {
+        const _tag = tag.replace(" ", "")
+        if(tag.length != 0)
+          tags.push(tag);
+      })
+      
+      
+
       for (let idx = 0; idx < this.files.length; idx++)
         payload.append(`file`, this.files[idx]);
 
       console.log(payload);
-      await this.$axios.post(
-        "http://127.0.0.1:9000/create-doc-with-attachment",
-        payload,
-        {
-          onUploadProgress: (e) => {
-            this.progressTotal = e.loaded;
-            this.progressCurrent = e.total;
-          },
-        }
-      );
+      // await this.$axios.post(
+      //   "http://127.0.0.1:9000/create-doc-with-attachment",
+      //   payload,
+      //   {
+      //     onUploadProgress: (e) => {
+      //       this.progressTotal = e.loaded;
+      //       this.progressCurrent = e.total;
+      //     },
+      //   }
+      // );
+      this.isLoading = false;
     },
   },
 };
