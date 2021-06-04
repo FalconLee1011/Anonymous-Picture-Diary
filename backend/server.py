@@ -70,9 +70,22 @@ def get_doc():
     name = args.get("name")
     age = args.get("age")
     date = args.get("date")
-    
     res = db.get_doc(name, age, date)
+    
     return jsonify(res), 200
+
+
+@app.route("/get-some-doc", methods=["GET"])
+def get_some_doc():
+    args = request.args
+    #begin: from which data
+    #end: to which data
+    begin = args.get("begin")
+    end = args.get("end")
+    res = db.get_some_doc(begin, end)
+        
+    return jsonify(res), 200
+
 
 @app.route("/delete-doc", methods=["DELETE"])
 def delete_doc():

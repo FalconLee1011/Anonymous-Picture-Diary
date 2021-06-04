@@ -57,8 +57,12 @@ def get_doc(name, age, date):
     
     if date: 
         query["date"] = date
-
+    
     return list(DB.get_collection(config.testCol).find(query, {"_id": 0}))
+
+def get_some_doc(begin, end):
+    query = dict()
+    return list(DB.get_collection(config.testCol).find(filter=query,projection={"_id":0}, skip=int(begin), limit=int(end)))
 
 def delete_doc(name, age, date):
     query = {
