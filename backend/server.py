@@ -12,16 +12,22 @@ CORS(app)
 @app.route("/create-doc-with-attachment", methods=["POST"])
 def create_doc_with_attachment():
     form = request.form
-    name = form.get("name", "unknown")
-    age = form.get("age", "-")
-    date = form.get("date")
-
-    file = request.files.get("file")
+    uploader = form.get("uploader", "anonymous")
+    secret = form.get("secret")
+    #taken_at需要嗎??
+    title = form.get("title", "no_title")
+    description = form.get("description", "none")
+    tags = form.get("tags") #tag預設是甚麼?
+    filenam = request.files.get("filenam")
+    
+    #照片為必須的?因為刪除貼文是用照片的uuid去辨識
+    if filenam is None:
+        return "photo is required.", 422
 
     # Just for the effect.
     sleep(0.75)
     
-    res = db.insert_doc(name, age, date, file)
+    res = db.insert_doc(uploader, title, description, tags, secret, filenam)
     return "ok", 200
 
 @app.route("/get-attachment", methods=["GET"])
@@ -33,6 +39,7 @@ def get_attachment():
     file, mime = db.get_file(uuid) 
     return send_file(file, mimetype=mime), 200
 
+#not use
 @app.route("/create-doc", methods=["POST"])
 def create_doc():
     body = request.get_json()
@@ -50,6 +57,7 @@ def create_doc():
     res = db.insert_doc(name, age, date)
     return "ok", 200
 
+#not use
 @app.route("/update-doc", methods=["PUT"])
 def update_doc():
     body = request.get_json()
@@ -67,10 +75,10 @@ def update_doc():
 @app.route("/get-doc", methods=["GET"])
 def get_doc():
     args = request.args
-    name = args.get("name")
-    age = args.get("age")
-    date = args.get("date")
-    res = db.get_doc(name, age, date)
+    uploader = args.get("uploader")
+    title = args.get("title")
+    tags = args.get("tags")
+    res = db.get_doc(uploader, title, tags)
     
     return jsonify(res), 200
 
@@ -90,12 +98,14 @@ def get_some_doc():
 @app.route("/delete-doc", methods=["DELETE"])
 def delete_doc():
     body = request.get_json()
-    name = body.get("name")
-    age = body.get("age")
-    date = body.get("date")
+    secret = body.get("secret")
+    filenam = body.get("filenam")
+    res = db.delete_doc(secret, filenam)
+
+    if res:
+        return "Deleted", 200
     
-    res = db.delete_doc(name, age, date)
-    return "Deleted", 200
+    return "No Authorization", 400  #錯誤代碼?
 
 def printAvailableAPIs():
     basic_methods = ["GET", "POST", "PUT", "DELETE"]
