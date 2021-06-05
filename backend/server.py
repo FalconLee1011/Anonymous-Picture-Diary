@@ -14,20 +14,20 @@ def create_doc_with_attachment():
     form = request.form
     uploader = form.get("uploader", "anonymous")
     secret = form.get("secret")
-    #taken_at需要嗎??
+    #taken_at
     title = form.get("title", "no_title")
     description = form.get("description", "none")
-    tags = form.get("tags") #tag預設是甚麼?
-    filenam = request.files.get("filenam")
+    tags = form.get("tags")
+    filename = request.files.get("filename")
     
     #照片為必須的?因為刪除貼文是用照片的uuid去辨識
-    if filenam is None:
+    if filename is None:
         return "photo is required.", 422
 
     # Just for the effect.
     sleep(0.75)
     
-    res = db.insert_doc(uploader, title, description, tags, secret, filenam)
+    res = db.insert_doc(uploader, title, description, tags, secret, filename)
     return "ok", 200
 
 @app.route("/get-attachment", methods=["GET"])
@@ -99,13 +99,13 @@ def get_some_doc():
 def delete_doc():
     body = request.get_json()
     secret = body.get("secret")
-    filenam = body.get("filenam")
-    res = db.delete_doc(secret, filenam)
+    filename = body.get("filename")
+    res = db.delete_doc(secret, filename)
 
     if res:
         return "Deleted", 200
     
-    return "No Authorization", 400  #錯誤代碼?
+    return "No Authorization", 403
 
 def printAvailableAPIs():
     basic_methods = ["GET", "POST", "PUT", "DELETE"]

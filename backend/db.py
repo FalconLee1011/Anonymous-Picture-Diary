@@ -11,7 +11,7 @@ def connect_db(host, database):
     DB = MongoClient(host)[database]
     return DB
 
-def insert_doc(uploader, title, description, tags, secret=None, filenam=None):
+def insert_doc(uploader, title, description, tags, secret=None, filename=None):
 
     doc = {
         "uploader": uploader, 
@@ -20,16 +20,16 @@ def insert_doc(uploader, title, description, tags, secret=None, filenam=None):
         "description": description,
         "tags": tags, 
         "secret": None,
-        "filenam": None
+        "filename": None
     }
 
-    if(filenam is not None):
-        file_attr = filehandler.saveFile(filenam)
+    if(filename is not None):
+        file_attr = filehandler.saveFile(filename)
         DB.get_collection(config.fileCol).insert_one(file_attr)
-        doc["filenam"] = file_attr.get("uuid")
+        doc["filename"] = file_attr.get("uuid")
     
     #test data
-    #doc["filenam"] = "test_file_name1"
+    #doc["filename"] = "test_file_name1"
     
     if(secret is not None):
         doc["secret"] = hashlib.sha256(secret.encode('utf-8')).hexdigest()
@@ -78,12 +78,12 @@ def get_some_doc(begin, end):
     query = dict()
     return list(DB.get_collection(config.testCol).find(filter=query,projection={"_id":0}, skip=int(begin), limit=int(end)))
 
-def delete_doc(secret, filenam):
-    deleted_data = DB.get_collection(config.testCol).find_one({"filenam": filenam}, {"_id":0})
+def delete_doc(secret, filename):
+    deleted_data = DB.get_collection(config.testCol).find_one({"filename": filename}, {"_id":0})
     target_secret = deleted_data.get("secret")
     if hashlib.sha256(secret.encode('utf-8')).hexdigest() == target_secret:
         query = {
-            "filenam": filenam
+            "filename": filename
         }
 
         return DB.get_collection(config.testCol).delete_one(query).acknowledged #刪除成功回傳true?
