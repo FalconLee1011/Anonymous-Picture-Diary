@@ -13,21 +13,22 @@ CORS(app)
 def create_doc_with_attachment():
     form = request.form
     uploader = form.get("uploader", "anonymous")
+    if(len(uploader) == 0):
+        uploader = "Anonymous | 匿名"
     secret = form.get("secret")
     #taken_at
     title = form.get("title", "no_title")
     description = form.get("description", "none")
-    tags = form.get("tags")
-    filename = request.files.get("filename")
+    tags = form.get("tags", []).replace(" ", "").split(",")
+    file = request.files.get("file")
+    print(tags)
     
     #照片為必須的?因為刪除貼文是用照片的uuid去辨識
-    if filename is None:
+    if file is None:
         return "photo is required.", 422
 
-    # Just for the effect.
-    sleep(0.75)
     
-    res = db.insert_doc(uploader, title, description, tags, secret, filename)
+    res = db.insert_doc(uploader, title, description, tags, secret, file)
     return "ok", 200
 
 @app.route("/get-attachment", methods=["GET"])
@@ -82,6 +83,13 @@ def get_doc():
     
     return jsonify(res), 200
 
+@app.route("/search", methods=["GET"])
+def search_doc():
+    args = request.args
+    keyword = args.get("keyword", "")
+    res = db.search_doc(keyword)
+    
+    return jsonify(res), 200
 
 @app.route("/get-some-doc", methods=["GET"])
 def get_some_doc():
@@ -97,9 +105,10 @@ def get_some_doc():
 
 @app.route("/delete-doc", methods=["DELETE"])
 def delete_doc():
-    body = request.get_json()
-    secret = body.get("secret")
-    filename = body.get("filename")
+    filename = request.args.get("filename")
+    secret = request.headers.get("secret")
+    print(filename)
+    print(secret)
     res = db.delete_doc(secret, filename)
 
     if res:

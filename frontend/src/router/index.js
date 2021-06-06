@@ -9,9 +9,10 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home/:keyword?',
     name: 'home',
-    component: home
+    component: home, 
+    alias: '/'
   },
   {
     path: '/upload',

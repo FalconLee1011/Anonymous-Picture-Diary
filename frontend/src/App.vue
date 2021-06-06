@@ -3,7 +3,7 @@
     <menubar v-on:toggleSearch=toggleSearch />
     <searchBar ref="searchBar" />
     <v-main>
-      <router-view class="mt-16" />
+      <router-view v-on:searchDone="toggleSearch($event)" class="mt-16" />
     </v-main>
   </v-app>
 </template>
@@ -20,9 +20,9 @@ export default {
     console.log("App has been created.");
   },
   methods: {
-    toggleSearch(){
+    toggleSearch(v=undefined){
       console.log("toggleSearch")
-      this.$refs.searchBar.toggle();
+      this.$refs.searchBar.toggle(v);
     }
   },
 };

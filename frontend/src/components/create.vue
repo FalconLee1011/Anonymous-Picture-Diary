@@ -17,6 +17,14 @@
           </v-col>
           <v-col>
             <v-text-field
+              v-model="title"
+              :name="Math.random()"
+              label="Title | 相片標題"
+              hint="Brief about the photo | 簡要說明相片。"
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-text-field
               v-model="secret"
               label="Secret | 密碼"
               :append-icon="showSecreat ? 'mdi-eye-off' : 'mdi-eye'"
@@ -96,6 +104,7 @@ export default {
 
       // Form's data
       uplodaer: "",
+      title: "", 
       secret: "",
       description: "",
       tags: "",
@@ -128,23 +137,28 @@ export default {
         if(tag.length != 0)
           tags.push(tag);
       })
-      
-      
-
+      payload.append( "uploader", this.uplodaer )
+      payload.append( "title", this.title )
+      payload.append( "secret", this.secret )
+      payload.append( "description", this.description )
+      payload.append( "tags", tags )
       for (let idx = 0; idx < this.files.length; idx++)
         payload.append(`file`, this.files[idx]);
 
       console.log(payload);
-      // await this.$axios.post(
-      //   "http://127.0.0.1:9000/create-doc-with-attachment",
-      //   payload,
-      //   {
-      //     onUploadProgress: (e) => {
-      //       this.progressTotal = e.loaded;
-      //       this.progressCurrent = e.total;
-      //     },
-      //   }
-      // );
+      await this.$axios.post(
+        "http://127.0.0.1:9000/create-doc-with-attachment",
+        payload,
+        {
+          onUploadProgress: (e) => {
+            this.progressTotal = e.loaded;
+            this.progressCurrent = e.total;
+          },
+        }
+      );
+      this.$toast("成功新增貼文！", {
+        type: "success"
+      });
       this.isLoading = false;
     },
   },

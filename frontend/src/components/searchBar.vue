@@ -33,13 +33,13 @@ export default {
     };
   },
   methods: {
-    toggle(){
-      this.show = !this.show;
+    toggle(v=undefined){
+      this.isLoading = false;
+      this.show = (v === undefined) ? !this.show : v;
     }, 
     async search(){
       this.isLoading = true;
-      
-      this.isLoading = false;
+      this.$router.push(`/home/${this.keyword}`);
     }
   },
 };

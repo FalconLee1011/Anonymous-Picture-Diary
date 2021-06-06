@@ -2,8 +2,8 @@
 host = "mongodb+srv://<user>:<password>@<mongodbURL>"
 
 # Select Database (one only)
-db = "testDB"
+db = "picDiary"
 
 # Define collections (can be multiple)
-testCol = "testCol"
+postCol = "posts"
 fileCol = "files"
