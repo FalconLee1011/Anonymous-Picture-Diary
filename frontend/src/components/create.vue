@@ -4,73 +4,77 @@
       <v-progress-linear v-model="progress" v-show="isLoading" />
       <v-card-title primary-title> Upload | 上傳照片 </v-card-title>
       <v-card-text>
-        資訊
-        <v-divider />
-        <v-row>
-          <v-col>
-            <v-text-field
-              v-model="uplodaer"
-              :name="Math.random()"
-              label="Uplodaer | 上傳者"
-              hint="Keep blank to stay anonymously. | 留白以抱持匿名身份。"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="title"
-              :name="Math.random()"
-              label="Title | 相片標題"
-              hint="Brief about the photo | 簡要說明相片。"
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              v-model="secret"
-              label="Secret | 密碼"
-              :append-icon="showSecreat ? 'mdi-eye-off' : 'mdi-eye'"
-              :type="showSecreat ? 'text' : 'password'"
-              @click:append="showSecreat = !showSecreat"
-              :name="Math.random()"
-              hint="The secret is the key to delete this post. | 此密碼是刪除貼文必備的資訊。"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-textarea
-              v-model="description"
-              :name="Math.random()"
-              rows="1"
-              auto-grow
-              hint="Multi-line is supported. | 支援多行"
-              label="Description | 相片說明"
-            ></v-textarea>
-          </v-col>
-        </v-row>
-        <v-row class="mb-3">
-          <v-col>
-            <v-text-field
-              v-model="tags"
-              label="Tags | 標籤"
-              :name="Math.random()"
-              hint="Split'em with comma | 使用逗號 ',' 將多個標籤分開。"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        照片
-        <v-divider class="mb-5" />
-        <v-row>
-          <v-col>
-            <file-pond
-              ref="uploader"
-              label-idle="Drag & drop to upload | 拖曳並放開以上傳"
-              :allow-multiple="false"
-              :instantUpload="false"
-              v-on:updatefiles="handleFileUpload"
-              :rules="[(v) => !!v || '請選擇至少一個檔案']"
-            />
-          </v-col>
-        </v-row>
+        <v-form @submit.prevent="submitData" ref="uploadPanel" lazy-validation>
+          資訊
+          <v-divider />
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="uplodaer"
+                :name="Math.random()"
+                label="Uplodaer | 上傳者"
+                hint="Keep blank to stay anonymously. | 留白以抱持匿名身份。"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="title"
+                :name="Math.random()"
+                label="Title | 相片標題"
+                :rules="[(v) => !!v || 'Title is required']"
+                hint="Brief about the photo | 簡要說明相片。"
+              ></v-text-field>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="secret"
+                label="Secret | 密碼"
+                :rules="[(v) => !!v || 'Secret is required']"
+                :append-icon="showSecreat ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="showSecreat ? 'text' : 'password'"
+                @click:append="showSecreat = !showSecreat"
+                :name="Math.random()"
+                hint="The secret is the key to delete this post. | 此密碼是刪除貼文必備的資訊。"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-textarea
+                v-model="description"
+                :name="Math.random()"
+                rows="1"
+                auto-grow
+                hint="Multi-line is supported. | 支援多行"
+                label="Description | 相片說明"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+          <v-row class="mb-3">
+            <v-col>
+              <v-text-field
+                v-model="tags"
+                label="Tags | 標籤"
+                :name="Math.random()"
+                hint="Split'em with comma | 使用逗號 ',' 將多個標籤分開。"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          照片
+          <v-divider class="mb-5" />
+          <v-row>
+            <v-col>
+              <file-pond
+                ref="uploader"
+                label-idle="Drag & drop to upload | 拖曳並放開以上傳"
+                :allow-multiple="false"
+                :instantUpload="false"
+                v-on:updatefiles="handleFileUpload"
+                :rules="[(v) => !!v || '請選擇至少一個檔案']"
+              />
+            </v-col>
+          </v-row>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
@@ -128,6 +132,19 @@ export default {
       this.files = files.map((files) => files.file);
     },
     async submitData() {
+      console.log(this.$refs.uploadPanel.validate());
+
+      if(!this.$refs.uploadPanel.validate()){
+        return;
+      }
+
+      if(this.files.length == 0){
+        this.$toast("請新增一張照片！", {
+          type: "warning"
+        });
+        return;
+      }
+
       this.isLoading = true;
       let payload = new FormData();
       let tags = [];
