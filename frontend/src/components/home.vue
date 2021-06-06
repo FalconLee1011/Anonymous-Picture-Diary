@@ -128,7 +128,7 @@ export default {
     async fetchPosts(skip=0, limit=5){
       const to = skip + limit;
       const res = await this.$axios.get(`http://127.0.0.1:9000/get-some-doc?begin=${skip}&end=${to}`);
-      if(res.data.length == 0){
+      if(res.data.length < limit){
         this.noMoreToLoad = true;
         return;
       }
