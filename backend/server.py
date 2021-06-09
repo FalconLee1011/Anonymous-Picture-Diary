@@ -9,38 +9,37 @@ app = Flask(__name__)
 app.debug = True
 CORS(app)
 
+
 @app.route("/create-doc-with-attachment", methods=["POST"])
 def create_doc_with_attachment():
     form = request.form
     uploader = form.get("uploader", "anonymous")
-    if(len(uploader) == 0):
+    if len(uploader) == 0:
         uploader = "Anonymous | 匿名"
     secret = form.get("secret")
-    #taken_at
     title = form.get("title", "no_title")
     description = form.get("description", "none")
     tags = form.get("tags", []).replace(" ", "").split(",")
     file = request.files.get("file")
     print(tags)
-    
-    #照片為必須的?因為刪除貼文是用照片的uuid去辨識
+
     if file is None:
         return "photo is required.", 422
 
-    
     res = db.insert_doc(uploader, title, description, tags, secret, file)
     return "ok", 200
+
 
 @app.route("/get-attachment", methods=["GET"])
 def get_attachment():
     args = request.args
     uuid = args.get("uuid")
-    if(uuid is None):
+    if uuid is None:
         return "File not specified", 422
-    file, mime = db.get_file(uuid) 
+    file, mime = db.get_file(uuid)
     return send_file(file, mimetype=mime), 200
 
-#not use
+
 @app.route("/create-doc", methods=["POST"])
 def create_doc():
     body = request.get_json()
@@ -54,11 +53,12 @@ def create_doc():
 
     if date is None:
         return "Date is required.", 422
-    
+
     res = db.insert_doc(name, age, date)
     return "ok", 200
 
-#not use
+
+# not use
 @app.route("/update-doc", methods=["PUT"])
 def update_doc():
     body = request.get_json()
@@ -73,6 +73,7 @@ def update_doc():
     res = db.update_doc(name, age, date, new_name, new_age, new_date)
     return "Updated!", 200
 
+
 @app.route("/get-doc", methods=["GET"])
 def get_doc():
     args = request.args
@@ -80,26 +81,28 @@ def get_doc():
     title = args.get("title")
     tags = args.get("tags")
     res = db.get_doc(uploader, title, tags)
-    
+
     return jsonify(res), 200
+
 
 @app.route("/search", methods=["GET"])
 def search_doc():
     args = request.args
     keyword = args.get("keyword", "")
     res = db.search_doc(keyword)
-    
+
     return jsonify(res), 200
+
 
 @app.route("/get-some-doc", methods=["GET"])
 def get_some_doc():
     args = request.args
-    #begin: from which data
-    #end: to which data
+    # begin: from which data
+    # end: to which data
     begin = args.get("begin")
     end = args.get("end")
     res = db.get_some_doc(begin, end)
-        
+
     return jsonify(res), 200
 
 
@@ -113,8 +116,9 @@ def delete_doc():
 
     if res:
         return "Deleted", 200
-    
+
     return "No Authorization", 403
+
 
 def printAvailableAPIs():
     basic_methods = ["GET", "POST", "PUT", "DELETE"]
@@ -122,8 +126,13 @@ def printAvailableAPIs():
     print("  {:^40} | {:^15}".format("URL", "METHODS"))
     # Flask app's property "url_map" has a function iter_rules() to loop through all available APIs.
     for p in app.url_map.iter_rules():
-        print("  {:<40} | {:<15}".format(str(p), ", ".join(set(p.methods).intersection(basic_methods))))
+        print(
+            "  {:<40} | {:<15}".format(
+                str(p), ", ".join(set(p.methods).intersection(basic_methods))
+            )
+        )
     print("")
+
 
 def main():
     db.connect_db(config.host, config.db)
